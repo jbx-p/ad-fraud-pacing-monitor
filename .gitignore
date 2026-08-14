@@ -1,5 +1,9 @@
 venv/
 __pycache__/
 *.pyc
-data/adops.db
 .ipynb_checkpoints/
+
+# Generated data — reproducible via src/generate_data.py with seed=42
+data/adops.db
+data/raw/*.csv
+data/processed/*.csv

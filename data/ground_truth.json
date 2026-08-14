@@ -1,0 +1,35 @@
+{
+  "pacing_behavior": {
+    "1": "overpacing",
+    "2": "overpacing",
+    "3": "underpacing",
+    "4": "underpacing",
+    "5": "healthy",
+    "6": "healthy",
+    "7": "healthy",
+    "8": "healthy",
+    "9": "healthy",
+    "10": "healthy",
+    "11": "healthy",
+    "12": "healthy",
+    "13": "healthy",
+    "14": "healthy",
+    "15": "healthy",
+    "16": "healthy",
+    "17": "healthy",
+    "18": "healthy"
+  },
+  "ab_effect_campaigns": [
+    5,
+    6,
+    7
+  ],
+  "fraud": {
+    "click_farm_campaign": 8,
+    "bot_traffic_campaign": 9,
+    "scripted_campaign": 10,
+    "injected_fraud_ip": "203.0.113.77"
+  },
+  "generated_at": "2026-08-14T13:47:49.600371",
+  "seed": 42
+}

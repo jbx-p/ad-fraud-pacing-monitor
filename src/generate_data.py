@@ -1,7 +1,7 @@
 ﻿"""
 Synthetic data generator for the Ad Campaign Performance & Fraud Monitoring project.
 
-This script creates 15-20 fake ad campaigns over a 60-day window, deliberately
+This script creates 18 fake ad campaigns over a 60-day window, deliberately
 injecting known pacing issues, fraud patterns, and A/B test effects. The "answer
 key" for everything injected is written to data/ground_truth.json so the
 detection modules built in later phases can be scored against known truth.
@@ -65,14 +65,28 @@ def generate_campaigns():
 
 
 def generate_daily_spend(campaigns_df, pacing_behavior):
+    """
+    Returns the daily_spend DataFrame AND a dict of true_cvr_by_campaign —
+    the clean, un-truncated ground-truth conversion rate per campaign. This
+    dict is passed directly into generate_click_events() so click-level
+    conversion probabilities are never derived from daily_spend's rounded
+    integer conversion counts, which suffer from int() truncation on
+    low-volume days (e.g. 0.6 conversions truncating to 0).
+    """
     rows = []
+    true_cvr_by_campaign = {}
+
     for _, camp in campaigns_df.iterrows():
         cid = camp["campaign_id"]
         daily_target = camp["daily_budget_target"]
         behavior = pacing_behavior[cid]
 
         true_ctr = np.random.uniform(0.01, 0.04)
-        true_cvr = np.random.uniform(0.02, 0.08)
+        # Floor raised to 0.03 (from 0.02) so low-click days truncate to 0
+        # conversions less often in the daily_spend table (used for pacing/
+        # CTR reporting only — NOT used for A/B click-level conversions).
+        true_cvr = np.random.uniform(0.03, 0.07)
+        true_cvr_by_campaign[cid] = true_cvr
 
         for day in range(SIM_DAYS):
             date = SIM_START_DATE + timedelta(days=day)
@@ -98,7 +112,7 @@ def generate_daily_spend(campaigns_df, pacing_behavior):
                 "conversions": max(conversions, 0),
             })
 
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows), true_cvr_by_campaign
 
 
 def generate_creatives(campaigns_df):
@@ -122,7 +136,20 @@ def generate_creatives(campaigns_df):
     return pd.DataFrame(creatives), ab_effect_campaigns
 
 
-def generate_click_events(campaigns_df, creatives_df, daily_spend_df, ab_effect_campaigns):
+def generate_click_events(campaigns_df, creatives_df, daily_spend_df, ab_effect_campaigns, true_cvr_by_campaign):
+    """
+    Generates click-level events. Injects three fraud patterns on purpose:
+      - Campaign 8: click-farm (IP cluster within a 2-min window)
+      - Campaign 9: bot traffic (high clicks, near-zero conversions)
+      - Campaign 10: script-clicked (perfectly regular time intervals)
+
+    Conversion probability per click is driven by true_cvr_by_campaign
+    (clean ground truth), NOT by daily_spend's rounded conversion counts.
+    For ab_effect campaigns [5, 6, 7], variant B gets a genuine 30%
+    RELATIVE lift over variant A's base rate — large enough to reliably
+    clear sampling noise across ~1,200 clicks/variant, but still a
+    realistic effect size for a real-world A/B test.
+    """
     events = []
     event_id = 1
     fraud_ground_truth = {
@@ -150,25 +177,25 @@ def generate_click_events(campaigns_df, creatives_df, daily_spend_df, ab_effect_
 
         date = datetime.fromisoformat(spend_row["date"])
         n_clicks = int(spend_row["clicks"])
-        n_conversions = int(spend_row["conversions"])
 
         variant_A_creative = creative_lookup[cid]["A"]
         variant_B_creative = creative_lookup[cid]["B"]
 
-        conversion_indices = set(
-            random.sample(range(n_clicks), min(n_conversions, n_clicks))
-        ) if n_clicks > 0 else set()
+        base_cvr = true_cvr_by_campaign[cid]
+        if cid in ab_effect_campaigns:
+            p_A = base_cvr
+            p_B = base_cvr * 1.30
+        else:
+            p_A = base_cvr
+            p_B = base_cvr
 
         for i in range(n_clicks):
             variant = np.random.choice(["A", "B"])
             creative_id = variant_A_creative if variant == "A" else variant_B_creative
 
             ts = date + timedelta(seconds=random.randint(0, 86399))
-            is_conv = i in conversion_indices
-
-            if cid in ab_effect_campaigns and not is_conv:
-                if variant == "B" and random.random() < 0.15:
-                    is_conv = True
+            p_convert = p_A if variant == "A" else p_B
+            is_conv = random.random() < p_convert
 
             events.append({
                 "event_id": event_id,
@@ -255,14 +282,14 @@ def main():
     campaigns_df, pacing_behavior = generate_campaigns()
 
     print("Generating daily spend...")
-    daily_spend_df = generate_daily_spend(campaigns_df, pacing_behavior)
+    daily_spend_df, true_cvr_by_campaign = generate_daily_spend(campaigns_df, pacing_behavior)
 
     print("Generating creatives...")
     creatives_df, ab_effect_campaigns = generate_creatives(campaigns_df)
 
     print("Generating click events (this includes fraud injection)...")
     click_events_df, fraud_ground_truth = generate_click_events(
-        campaigns_df, creatives_df, daily_spend_df, ab_effect_campaigns
+        campaigns_df, creatives_df, daily_spend_df, ab_effect_campaigns, true_cvr_by_campaign
     )
 
     print("Generating A/B test assignments...")
@@ -284,6 +311,7 @@ def main():
     ground_truth = {
         "pacing_behavior": pacing_behavior,
         "ab_effect_campaigns": ab_effect_campaigns,
+        "true_cvr_by_campaign": true_cvr_by_campaign,
         "fraud": fraud_ground_truth,
         "generated_at": datetime.now().isoformat(),
         "seed": 42,

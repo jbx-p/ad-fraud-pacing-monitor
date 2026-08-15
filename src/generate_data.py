@@ -217,7 +217,7 @@ def generate_click_events(campaigns_df, creatives_df, daily_spend_df, ab_effect_
                 events.append({
                     "event_id": event_id,
                     "campaign_id": cid,
-                    "creative_id": variant_A_creative,
+                    "creative_id": random.choice([variant_A_creative, variant_B_creative]),
                     "timestamp": ts.isoformat(),
                     "ip_address": farm_ip,
                     "user_agent": fake.user_agent(),

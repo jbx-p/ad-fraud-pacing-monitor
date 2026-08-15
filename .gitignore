@@ -7,3 +7,6 @@ __pycache__/
 data/adops.db
 data/raw/*.csv
 data/processed/*.csv
+
+# Dashboard exports ARE tracked (small, pre-aggregated, needed for the .twbx)
+!dashboard/data/*.csv

@@ -49,6 +49,20 @@ across 500 simulated null-effect tests.
 campaigns (2 overpacing, 2 underpacing) and projects days-to-budget-
 exhaustion using a 3-day rolling spend average.
 
+
+## Live Dashboard
+
+**[View the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/joel.bumba1631/viz/AdCampaignFraudPacingMonitor/AdCampaignPacingMonitor)**
+
+Three tabs, each tying together the validated results above into an
+explorable view:
+- **Pacing** — small-multiples spend trend for flagged campaigns, KPI
+  cards, urgency-ranked table
+- **Fraud Monitoring** — hour x campaign click-volume heatmap, flagged
+  click-farm IP burst pattern, method precision/recall comparison
+- **A/B Testing** — variant A vs B conversion rate by campaign, full
+  verdict table with BH-corrected p-values and achieved power
+
 ---
 
 ## Architecture

@@ -8,6 +8,7 @@ detection modules built in later phases can be scored against known truth.
 """
 
 import json
+import os
 import random
 from datetime import datetime, timedelta
 
@@ -278,6 +279,15 @@ def generate_ab_assignments(campaigns_df, click_events_df):
 
 
 def main():
+    
+
+    # Ensure output directories exist -- data/raw and data/processed aren't
+    # committed to git (only generated CSVs are excluded, but git doesn't
+    # track empty directories either), so a fresh checkout on a CI runner
+    # or a new clone won't have them without this.
+    os.makedirs("data/raw", exist_ok=True)
+    os.makedirs("data/processed", exist_ok=True)
+    
     print("Generating campaigns...")
     campaigns_df, pacing_behavior = generate_campaigns()
 

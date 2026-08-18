@@ -1,0 +1,16 @@
+campaign_id,campaign_name,rate_A,rate_B,relative_lift_pct,p_value,p_value_bh_corrected,achieved_power,verdict,ground_truth_real_effect
+1,Whiteboard One-To-One Web-Readiness Campaign,0.0747,0.0629,-15.8,0.3232,0.58169,0.164,UNDERPOWERED - inconclusive,False
+2,Innovate E-Business Applications Campaign,0.0704,0.0717,1.8,0.88874,0.95222,0.052,UNDERPOWERED - inconclusive,False
+3,Enhance Proactive Schemas Campaign,0.0555,0.0496,-10.7,0.44927,0.58271,0.118,UNDERPOWERED - inconclusive,False
+4,Incubate Next-Generation E-Services Campaign,0.0562,0.042,-25.3,0.28457,0.58169,0.181,UNDERPOWERED - inconclusive,False
+5,Implement Granular E-Commerce Campaign,0.0319,0.044,38.0,0.25713,0.58169,0.2,UNDERPOWERED - inconclusive,True
+6,Engineer Cross-Platform Platforms Campaign,0.0403,0.0473,17.5,0.38779,0.58169,0.137,UNDERPOWERED - inconclusive,True
+7,Iterate Cross-Media Metrics Campaign,0.058,0.0692,19.4,0.24325,0.58169,0.209,UNDERPOWERED - inconclusive,True
+11,Synergize Efficient Bandwidth Campaign,0.0336,0.025,-25.7,0.34921,0.58169,0.153,UNDERPOWERED - inconclusive,False
+12,Repurpose Real-Time Methodologies Campaign,0.0357,0.0504,41.3,0.03443,0.42585,0.553,SIGNIFICANT WINNER (B),False
+13,Incentivize Granular Bandwidth Campaign,0.0675,0.0695,3.0,0.83377,0.95222,0.055,UNDERPOWERED - inconclusive,False
+14,Scale Magnetic Methodologies Campaign,0.0703,0.0442,-37.2,0.05678,0.42585,0.479,UNDERPOWERED - inconclusive,False
+15,Enhance Robust Vortals Campaign,0.033,0.0406,23.0,0.37349,0.58169,0.144,UNDERPOWERED - inconclusive,False
+16,Maximize Turn-Key E-Tailers Campaign,0.0525,0.0425,-19.0,0.20524,0.58169,0.242,UNDERPOWERED - inconclusive,False
+17,Orchestrate Back-End Channels Campaign,0.0781,0.0704,-9.9,0.46617,0.58271,0.111,UNDERPOWERED - inconclusive,False
+18,Morph Cutting-Edge Applications Campaign,0.0495,0.0489,-1.2,0.95972,0.95972,0.05,UNDERPOWERED - inconclusive,False

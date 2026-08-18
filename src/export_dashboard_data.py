@@ -91,6 +91,57 @@ def export_fraud_data(engine, ground_truth):
     print(f"  fraud_precision_recall.csv: {len(precision_recall)} rows")
 
 
+def export_ab_verdicts():
+    """
+    Re-runs the core A/B analysis (power, z-test, BH correction, min-lift
+    gate) and exports one row per non-fraud campaign with verdict, p-value,
+    and achieved power -- the fields the dashboard's verdict table needs
+    that aren't in the raw variant_performance query output.
+    """
+    import subprocess
+    import sys
+
+    # Reuse ab_testing.py's own functions directly instead of re-implementing
+    sys.path.insert(0, "src")
+    import ab_testing as abt
+
+    variant_df, _ = abt.load_variant_data()
+    with open(GROUND_TRUTH_PATH) as f:
+        ground_truth = json.load(f)
+
+    true_effect_campaigns = set(ground_truth["ab_effect_campaigns"])
+    fraud_campaign_ids = {
+        ground_truth["fraud"]["click_farm_campaign"],
+        ground_truth["fraud"]["bot_traffic_campaign"],
+        ground_truth["fraud"]["scripted_campaign"],
+    }
+
+    campaigns = variant_df[["campaign_id", "campaign_name"]].drop_duplicates()
+    campaigns = campaigns[~campaigns["campaign_id"].isin(fraud_campaign_ids)]
+
+    results = []
+    for _, camp in campaigns.iterrows():
+        r = abt.analyze_campaign(camp["campaign_id"], camp["campaign_name"], variant_df)
+        if r:
+            results.append(r)
+
+    pvals = [r["p_value"] for r in results]
+    from statsmodels.stats.multitest import multipletests
+    reject, pvals_corrected, _, _ = multipletests(pvals, alpha=abt.ALPHA, method="fdr_bh")
+    for r, rej, p_corr in zip(results, reject, pvals_corrected):
+        r["p_value_bh_corrected"] = round(p_corr, 5)
+        r["significant_after_correction"] = bool(rej)
+        r["ground_truth_real_effect"] = r["campaign_id"] in true_effect_campaigns
+
+    out_df = pd.DataFrame(results)[[
+        "campaign_id", "campaign_name", "rate_A", "rate_B",
+        "relative_lift_pct", "p_value", "p_value_bh_corrected",
+        "achieved_power", "verdict", "ground_truth_real_effect",
+    ]]
+    out_df.to_csv(f"{OUT_DIR}/ab_verdicts.csv", index=False)
+    print(f"  ab_verdicts.csv: {len(out_df)} rows")
+
+
 def export_ab_data(engine, ground_truth):
     with open("sql/queries/variant_performance.sql") as f:
         sql = f.read()
@@ -142,6 +193,7 @@ def main():
 
     print("Exporting A/B test data...")
     export_ab_data(engine, ground_truth)
+    export_ab_verdicts()
 
     print(f"\nAll dashboard CSVs written to {OUT_DIR}/")
 

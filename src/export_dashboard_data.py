@@ -133,6 +133,24 @@ def export_ab_verdicts():
         r["significant_after_correction"] = bool(rej)
         r["ground_truth_real_effect"] = r["campaign_id"] in true_effect_campaigns
 
+        # Recompute verdict using BH-corrected significance, not the raw
+        # p-value analyze_campaign() used -- this is what fixes campaign 12
+        # style false positives (raw p=0.034, BH-corrected p=0.43) from
+        # showing an incorrect "SIGNIFICANT WINNER" verdict downstream.
+        lift_magnitude = abs(r["relative_lift_pct"]) if r["relative_lift_pct"] is not None else 0.0
+        is_meaningful = lift_magnitude >= abt.MIN_MEANINGFUL_RELATIVE_LIFT_PCT
+
+        if rej and is_meaningful and r["rate_B"] > r["rate_A"]:
+            r["verdict"] = "SIGNIFICANT WINNER (B)"
+        elif rej and is_meaningful and r["rate_A"] > r["rate_B"]:
+            r["verdict"] = "SIGNIFICANT WINNER (A)"
+        elif rej and not is_meaningful:
+            r["verdict"] = "Significant but trivial effect (likely large-N artifact)"
+        elif not r["adequately_powered"]:
+            r["verdict"] = "UNDERPOWERED - inconclusive"
+        else:
+            r["verdict"] = "No significant difference"
+
     out_df = pd.DataFrame(results)[[
         "campaign_id", "campaign_name", "rate_A", "rate_B",
         "relative_lift_pct", "p_value", "p_value_bh_corrected",

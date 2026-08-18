@@ -7,7 +7,7 @@ campaign_id,campaign_name,rate_A,rate_B,relative_lift_pct,p_value,p_value_bh_cor
 6,Engineer Cross-Platform Platforms Campaign,0.0403,0.0473,17.5,0.38779,0.58169,0.137,UNDERPOWERED - inconclusive,True
 7,Iterate Cross-Media Metrics Campaign,0.058,0.0692,19.4,0.24325,0.58169,0.209,UNDERPOWERED - inconclusive,True
 11,Synergize Efficient Bandwidth Campaign,0.0336,0.025,-25.7,0.34921,0.58169,0.153,UNDERPOWERED - inconclusive,False
-12,Repurpose Real-Time Methodologies Campaign,0.0357,0.0504,41.3,0.03443,0.42585,0.553,SIGNIFICANT WINNER (B),False
+12,Repurpose Real-Time Methodologies Campaign,0.0357,0.0504,41.3,0.03443,0.42585,0.553,UNDERPOWERED - inconclusive,False
 13,Incentivize Granular Bandwidth Campaign,0.0675,0.0695,3.0,0.83377,0.95222,0.055,UNDERPOWERED - inconclusive,False
 14,Scale Magnetic Methodologies Campaign,0.0703,0.0442,-37.2,0.05678,0.42585,0.479,UNDERPOWERED - inconclusive,False
 15,Enhance Robust Vortals Campaign,0.033,0.0406,23.0,0.37349,0.58169,0.144,UNDERPOWERED - inconclusive,False

@@ -1,6 +1,6 @@
 # Morning Report — Ad Campaign Performance & Fraud Monitoring
 
-Generated: 2026-08-19 07:42:59
+Generated: 2026-08-20 07:46:03
 
 ## Pipeline Status
 
@@ -38,4 +38,4 @@ Generated: 2026-08-19 07:42:59
 [Full report](ab_test_report.md)
 
 ---
-*Generated automatically by run_daily_check.py at 2026-08-19 07:42:59*
+*Generated automatically by run_daily_check.py at 2026-08-20 07:46:03*

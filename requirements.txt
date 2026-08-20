@@ -1,9 +1,5 @@
-﻿pandas
+pandas
 numpy
-scipy
 scikit-learn
-statsmodels
+jupyter
 matplotlib
-seaborn
-Faker
-SQLAlchemy
